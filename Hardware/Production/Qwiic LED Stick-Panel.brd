@@ -9,13 +9,15 @@
 <grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.005" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
+<layer number="15" name="Route15" color="4" fill="6" visible="no" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
-<layer number="21" name="tPlace" color="16" fill="1" visible="yes" active="yes"/>
-<layer number="22" name="bPlace" color="14" fill="1" visible="yes" active="yes"/>
+<layer number="20" name="Dimension" color="24" fill="1" visible="yes" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
@@ -44,10 +46,8 @@
 <layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="50" name="dxf" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="51" name="tDocu" color="6" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
-<layer number="15" name="Route15" color="4" fill="6" visible="no" active="no"/>
 <layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
 <layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
 <layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
@@ -162,17 +162,17 @@
 <wire x1="91.44" y1="77.216" x2="91.44" y2="51.816" width="0.2032" layer="20"/>
 <text x="6.223" y="53.086" size="1.27" layer="16" font="vector" ratio="15" rot="MR0" align="center">X01</text>
 <wire x1="-0.254" y1="-6.858" x2="-0.254" y2="90.424" width="0.381" layer="46"/>
-<text x="-0.254" y="92.71" size="1.778" layer="46" font="vector" ratio="15" align="center">v-score</text>
+<text x="-0.254" y="92.71" size="1.778" layer="46" ratio="15" align="center">v-score</text>
 <wire x1="91.694" y1="-6.858" x2="91.694" y2="90.424" width="0.381" layer="46"/>
-<text x="91.694" y="92.71" size="1.778" layer="46" font="vector" ratio="15" align="center">v-score</text>
+<text x="91.694" y="92.71" size="1.778" layer="46" ratio="15" align="center">v-score</text>
 <wire x1="-6.858" y1="-0.254" x2="104.648" y2="-0.254" width="0.381" layer="46"/>
-<text x="112.268" y="-0.254" size="1.778" layer="46" font="vector" ratio="15" align="center">v-score</text>
+<text x="112.268" y="-0.254" size="1.778" layer="46" ratio="15" align="center">v-score</text>
 <wire x1="-6.858" y1="25.654" x2="104.648" y2="25.654" width="0.381" layer="46"/>
-<text x="112.268" y="25.654" size="1.778" layer="46" font="vector" ratio="15" align="center">v-score</text>
+<text x="112.268" y="25.654" size="1.778" layer="46" ratio="15" align="center">v-score</text>
 <wire x1="-6.858" y1="51.562" x2="104.648" y2="51.562" width="0.381" layer="46"/>
-<text x="112.268" y="51.562" size="1.778" layer="46" font="vector" ratio="15" align="center">v-score</text>
+<text x="112.268" y="51.562" size="1.778" layer="46" ratio="15" align="center">v-score</text>
 <wire x1="-6.858" y1="77.47" x2="104.648" y2="77.47" width="0.381" layer="46"/>
-<text x="112.268" y="77.47" size="1.778" layer="46" font="vector" ratio="15" align="center">v-score</text>
+<text x="112.268" y="77.47" size="1.778" layer="46" ratio="15" align="center">v-score</text>
 <wire x1="-6.858" y1="-0.508" x2="98.298" y2="-0.508" width="0.254" layer="20"/>
 <wire x1="98.298" y1="-0.508" x2="98.298" y2="-6.858" width="0.254" layer="20"/>
 <wire x1="98.298" y1="-6.858" x2="-6.858" y2="-6.858" width="0.254" layer="20"/>
