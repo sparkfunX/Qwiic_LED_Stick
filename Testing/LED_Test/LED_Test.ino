@@ -9,34 +9,34 @@ void setup() {
 }
 
 void loop() {
-
+  SetLEDColor(10, 10, 10);
+  delay(1000);
+  for (int i = 0; i < 10; i++) { //individually controls color
+    SetLEDColor(i, 10, i, 10 - i);
+    delay(100);
+  }
+  for (int i = 0; i < 10; i++) { //individually controls brightness
+    SetLEDBrightness(i, 31 - 2 * i);
+    delay(200);
+  }
+  LEDOff();
+  changeAddress(34, 55);
+  delay(1000);
+  for (int i = 0; i < 10; i++) { //adjusting brightness after turned off does nothing
+    SetLEDBrightness(i, 31 - 2 * i);
+    delay(100);
+  }  //6 seconds
+  for (int i = 0; i < 10; i++) { //brightness of all increses as number of lit LEDs increases
+    SetLEDColor(i, 10 - i, 10, i);
+    SetLEDBrightness(2 * (i + 1));
     delay(1000);
-    for (int i = 0; i<10; i++){//individually controls color
-      SetLEDColor(i,10,i,10-i);
-      delay(100);
-    }
-    for (int i = 0; i<10; i++){ //individually controls brightness
-      SetLEDBrightness(i,31-2*i);
-      delay(200);
-    }
-    LEDOff();
-    changeAddress(34,55);
-    delay(1000);
-    for (int i = 0; i<10; i++){ //adjusting brightness after turned off does nothing
-      SetLEDBrightness(i,31-2*i);
-      delay(100);
-    }  //6 seconds
-    for (int i = 0; i<10; i++){//brightness of all increses as number of lit LEDs increases
-      SetLEDColor(i,10-i,10,i);
-      SetLEDBrightness(2*(i+1));
-    delay(1000);
-    } //16 seconds
-    SetLEDColor(0,10,10);
-    delay(1000);
-    LEDOff();
-    changeAddress(55,34);
-    delay(3000);
-      //20 seconds
+  } //16 seconds
+  SetLEDColor(0, 10, 10);
+  delay(1000);
+  LEDOff();
+  changeAddress(55, 34);
+  delay(3000);
+  //20 seconds
 }
 //each color must be a value between 0-255
 boolean SetLEDColor(byte number, byte red, byte green, byte blue) {
