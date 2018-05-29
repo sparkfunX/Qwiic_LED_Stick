@@ -1,65 +1,87 @@
+/*
+  An I2C based LED Stick
+  By: Ciara Jekel
+  SparkFun Electronics
+  Date: May 29th, 2018
+  License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
+
+  Qwiic LED Stick is an I2C based LED Stick that stores an array of colors and brightness to write to an LED strip
+
+  Feel like supporting our work? Buy a board from SparkFun!
+  https://www.sparkfun.com/products/14641
+
+  To install support for ATtiny85 in Arduino IDE: https://github.com/SpenceKonde/ATTinyCore/blob/master/Installation.md
+  This core is installed from the Board Manager menu
+  This core has built in support for I2C S/M and serial
+  If you have Dave Mellis' ATtiny installed you may need to remove it from \Users\xx\AppData\Local\Arduino15\Packages
+
+  To support 400kHz I2C communication reliably ATtiny85 needs to run at 8MHz. This requires user to
+  click on 'Burn Bootloader' before code is loaded.
+
+
+*/
+
 #include <Wire.h>
 #include <EEPROM.h>
 #include <avr/sleep.h> //Needed for sleep_mode
 
-#define LOCATION_LED_LENGTH 0x02
 #define LOCATION_I2C_ADDRESS 0x01 //Location in EEPROM where the I2C address is stored
-#define I2C_ADDRESS_DEFAULT (0x23)
-#define I2C_ADDRESS_JUMPER (0x22)
-#define LED_LENGTH (10) //Code supports up to length 222, though board may not necessarily handle current required
+#define LOCATION_LED_LENGTH 0x02 //Location in EEPROM where the LED_LENGTH is stored
+#define I2C_ADDRESS_DEFAULT (0x23) //Default I2C address
+#define I2C_ADDRESS_JUMPER (0x22) //Address with jumper closed 
+#define LED_LENGTH (10) //Code supports up to length 90, though board may not necessarily handle current required
 #define LED_LENGTH_MAX (90)
 
 #define COMMAND_CHANGE_ADDRESS (0xC7)
-#define COMMAND_CHANGE_LED_LENGTH (0x69)
-#define COMMAND_WRITE_SINGLE_LED_COLOR (0x70)
-#define COMMAND_WRITE_ALL_LED_COLOR (0x71)
-#define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x72)
-#define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x73)
-#define COMMAND_WRITE_ALL_LED_OFF (0x74)
-
-
-//#define ATTINY85
-//#ifdef ATTINY85
-//#define DATAPIN (3)
-//#define CLK (4)
-//#endif
-#define ARDUINOUNO
-#ifdef ARDUINOUNO
-#define DATAPIN (11)
-#define CLK (13)
-#endif
+#define COMMAND_CHANGE_LED_LENGTH (0x70)
+#define COMMAND_WRITE_SINGLE_LED_COLOR (0x71)
+#define COMMAND_WRITE_ALL_LED_COLOR (0x72)
+#define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x73)
+#define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x74)
+#define COMMAND_WRITE_ALL_LED_OFF (0x75)
 
 //Variables used in the I2C interrupt so we use volatile
 volatile byte setting_i2c_address = I2C_ADDRESS_DEFAULT; //The 7-bit I2C address of this LEDstick
 volatile byte setting_LED_length = LED_LENGTH; //The default length of the LED strip
+
 //This struct keeps a record of the states of all LEDs
 typedef struct {
   volatile byte red;
   volatile byte green;
   volatile byte blue;
   volatile byte brightness;
-} color;
-color LEDStrip[LED_LENGTH_MAX];
+} LEDSettings;
+LEDSettings LEDStrip[LED_LENGTH_MAX]; //creates a global array of the states of all LEDs
+
 const byte addr = 9; //Addr jumper
+const byte dataPin = 11; //pin to data line of LEDs
+const byte clkPin = 13; //pin to clock line of LEDs
+
+//  for ATtiny85
+//  const byte addr = 1; //Addr jumper
+//  const byte dataPin = 3; //pin to data line of LEDs
+//  const byte clkPin = 4; //pin to clock line of LEDs
 
 void setup() {
-  pinMode(DATAPIN, OUTPUT); //Data out to the LEDs
-  pinMode(CLK, OUTPUT); //CLK for LED data shift
+  pinMode(addr, INPUT);
+  pinMode(dataPin, OUTPUT); //Data out to the LEDs
+  pinMode(clkPin, OUTPUT); //clkPin for LED data shift
+
   set_sleep_mode(SLEEP_MODE_IDLE);
   sleep_enable();
   readSystemSettings(); //Load all system settings from EEPROM
   for (byte i = 0; i < LED_LENGTH_MAX; i++) {
-    initializeColorArray(LEDStrip[i]);
+    initializeLEDArray(LEDStrip[i]);  //Set all values
   }
   startI2C(); //Determine the I2C address we should be using and begin listening on I2C bus
 }
 
 void loop() {
-  WriteLED();
+  WriteLED(); //Write the current state of the LED array to the LED strip
   sleep_mode(); //Stop everything and go to sleep. Wake up if I2C event occurs.
 }
 
-//When LEDStrip receives data bytes, this function is called as an interrupt
+//When LEDStick receives data bytes, this function is called as an interrupt
 //Can initiate commands to change color/brightness/length/I2C address
 void receiveEvent(int numberOfBytesReceived)
 {
@@ -85,16 +107,15 @@ void receiveEvent(int numberOfBytesReceived)
       }
     }
     else if (incoming == COMMAND_CHANGE_LED_LENGTH ) //Change how many LEDs are in your strip
-    { 
+    {
       if (Wire.available())
       {
         byte temp_LED_length = Wire.read();
         //Error check
-        if (temp_LED_length > LED_LENGTH_MAX)
+        if (temp_LED_length < 1 || temp_LED_length > LED_LENGTH_MAX)
           continue; //Command failed. This length is not supported.
         setting_LED_length = temp_LED_length;
         EEPROM.write(LOCATION_LED_LENGTH, setting_LED_length);
-
       }
     }
     else if (incoming == COMMAND_WRITE_SINGLE_LED_COLOR) //Change color LEDS
@@ -102,21 +123,23 @@ void receiveEvent(int numberOfBytesReceived)
       if (Wire.available())
       {
         byte number = Wire.read();
-        LEDStrip[number].red = Wire.read();
-        LEDStrip[number].green = Wire.read();
-        LEDStrip[number].blue = Wire.read();
+        if (number < 1 || number > LED_LENGTH_MAX)
+          continue; //error check, cannot write to array indexed at locations <0 or >max index
+        LEDStrip[number - 1].red = Wire.read();
+        LEDStrip[number - 1].green = Wire.read();
+        LEDStrip[number - 1].blue = Wire.read();
       }
     }
     else if (incoming == COMMAND_WRITE_ALL_LED_COLOR) {
       if (Wire.available())
       {
-        byte red = Wire.read();
-        byte green = Wire.read();
-        byte blue = Wire.read();
+        LEDStrip[0].red = Wire.read();
+        LEDStrip[0].green = Wire.read();
+        LEDStrip[0].blue = Wire.read();
         for (byte i = 0; i < setting_LED_length; i++) {
-          LEDStrip[i].red = red;
-          LEDStrip[i].green = green;
-          LEDStrip[i].blue = blue;
+          LEDStrip[i].red = LEDStrip[0].red;
+          LEDStrip[i].green = LEDStrip[0].green;
+          LEDStrip[i].blue = LEDStrip[0].blue;
         }
       }
     }
@@ -124,41 +147,46 @@ void receiveEvent(int numberOfBytesReceived)
       if (Wire.available())
       {
         byte number = Wire.read();
-        LEDStrip[number].brightness = Wire.read();
+        if (number < 1 || number > LED_LENGTH_MAX)
+          continue; //error check, cannot write to array indexed at locations <0 or >max index
+        LEDStrip[number - 1].brightness = Wire.read();
       }
     }
     else if (incoming == COMMAND_WRITE_ALL_LED_BRIGHTNESS) {
       if (Wire.available())
       {
-        byte brightness = Wire.read();
+        LEDStrip[0].brightness = Wire.read();
         for (byte i = 0; i < setting_LED_length; i++)
-          LEDStrip[i].brightness = brightness;
+          LEDStrip[i].brightness = LEDStrip[0].brightness;
       }
     }
     else if (incoming == COMMAND_WRITE_ALL_LED_OFF) {
       for (byte i = 0; i < setting_LED_length; i++) {
-        LEDStrip[i].red &= 0;
-        LEDStrip[i].green &= 0;
-        LEDStrip[i].blue &= 0;
+        LEDStrip[i].red = 0;
+        LEDStrip[i].green = 0;
+        LEDStrip[i].blue = 0;
       }
     }
   }
 }
+
+//Shifts out information from the LED settings array to the LEDs
 void WriteLED(void) {
   for (byte i = 0; i < 4; i++) { //start frame is 4 bytes of 0
-    shiftOut(DATAPIN, CLK, MSBFIRST, (byte)0);
+    shiftOut(dataPin, clkPin, MSBFIRST, (byte)0);
   }
   for (byte i = 0; i < setting_LED_length; i++) { //LED frame starts with 0b111, is followed by 5 bit brightness value, then bytes for blue, green, red
-    shiftOut(DATAPIN, CLK, MSBFIRST, (0b11100000) | LEDStrip[i].brightness);
-    shiftOut(DATAPIN, CLK, MSBFIRST, LEDStrip[i].blue);
-    shiftOut(DATAPIN, CLK, MSBFIRST, LEDStrip[i].green);
-    shiftOut(DATAPIN, CLK, MSBFIRST, LEDStrip[i].red);
+    shiftOut(dataPin, clkPin, MSBFIRST, (0b11100000) | LEDStrip[i].brightness);
+    shiftOut(dataPin, clkPin, MSBFIRST, LEDStrip[i].blue);
+    shiftOut(dataPin, clkPin, MSBFIRST, LEDStrip[i].green);
+    shiftOut(dataPin, clkPin, MSBFIRST, LEDStrip[i].red);
   }
-  for (byte i = 0; i < 4; i++) { //stop frame is 3 bytes of 0 followed by 1 byte 1
-    shiftOut(DATAPIN, CLK, MSBFIRST, (byte)0xFF);
+  for (byte i = 0; i < 3; i++) { //stop frame is 3 bytes of 0 followed by 1 byte 1
+    shiftOut(dataPin, clkPin, MSBFIRST, (byte)0);
   }
-  //  shiftOut(DATAPIN, CLK, MSBFIRST, (byte)1);
+  shiftOut(dataPin, clkPin, MSBFIRST, (byte)1);
 }
+
 //Reads the current system settings from EEPROM
 //If anything looks weird, reset setting to default value
 void readSystemSettings(void)
@@ -178,12 +206,17 @@ void readSystemSettings(void)
     EEPROM.write(LED_LENGTH, setting_LED_length);
   }
 }
-void initializeColorArray(color colorPtr) {
-  (colorPtr).brightness = 31; //brightness starts at maximum
-  (colorPtr).red = 0;
-  (colorPtr).green = 0;
-  (colorPtr).blue = 0; //colors start at zero so the LED starts OFF
+
+//Sets all color values in LEDSettings array to 0 and brightness to maximum of 31
+void initializeLEDArray(LEDSettings LED) {
+  LED.brightness = 31; //brightness starts at maximum
+  LED.red = 0;
+  LED.green = 0;
+  LED.blue = 0; //colors start at zero so the LED starts OFF
 }
+
+
+//Begin listening on I2C bus as I2C slave using the global variable setting_i2c_address
 void startI2C()
 {
   Wire.end(); //Before we can change addresses we need to stop

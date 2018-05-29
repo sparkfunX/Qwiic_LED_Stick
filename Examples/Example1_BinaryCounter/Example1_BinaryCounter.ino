@@ -1,44 +1,52 @@
+/*
+  An I2C based LED Stick
+  By: Ciara Jekel
+  SparkFun Electronics
+  Date: May 29th, 2018
+  License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
+
+  Feel like supporting our work? Buy a board from SparkFun!
+  https://www.sparkfun.com/products/14641
+
+  This example counts up 10 bits of binary and displays the number on the LED Stick.
+
+*/
+
 #include <Wire.h>
 
-byte LEDAddress = 34;
+byte LEDAddress = 0x22;
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
-  Serial.println("LED TEST");
-  //SetLEDColor(255, 255, 255);
 }
 
 void loop() {
-  SetLEDColor(10, 10, 10);
-  delay(1000);
-  for (int i = 1; i <= 10; i++) { //individually controls color
-    SetLEDColor(i, 10, i, 10 - i);
-    delay(100);
-  }
-  for (int i = 1; i <= 10; i++) { //individually controls brightness
-    SetLEDBrightness(i, 31 - 2 * i);
-    delay(200);
-  }
-  LEDOff();
-  //changeAddress(34, 55);
-  delay(1000);
-  for (int i = 1; i <= 10; i++) { //adjusting brightness after turned off does nothing
-    SetLEDBrightness(i, 31 - 2 * i);
-    delay(100);
-  }  //6 seconds
-  for (int i = 1; i <= 10; i++) { //brightness of all increses as number of lit LEDs increases
-    SetLEDColor(i, 10 - i, 10, i);
-    SetLEDBrightness(2 * (i + 1));
+  for (int count = 0; count < 1024; count++) {
+    binaryLEDDisplay(count, 10);
+    binarySerialDisplay(count, 10);
     delay(1000);
-  } //16 seconds
-  SetLEDColor(0, 10, 10);
-  delay(1000);
-  LEDOff();
-  //changeAddress(55, 34);
-  delay(3000);
-  //20 seconds
+  }
+
 }
+
+//Display binary on LEDS (LSB==LED1) of length LEDLength
+void binaryLEDDisplay(int count, byte LEDLength) {
+  for (byte i = 0; i < LEDLength; i++) {
+    SetLEDColor(i + 1, 255 * ((count & 1 << i) != 0), 0, 0); //ith LED will be red if the ith bit of the count is not zero
+  }
+}
+
+//Serial.print decimal and binary value of count, expecting n bits
+void binarySerialDisplay(int count, byte n) {
+  Serial.print(count);
+  Serial.print("\t|\t");
+  for (byte i = n; i > 0 ; i--) { //Start printing at MSB
+    Serial.print((count & 1 << (i - 1)) != 0);  //ith bit will be 1 if the ith bit of the count is not zero, and 0 if it is 0
+  }
+  Serial.print("\n"); //new line
+}
+
 //Change the color of a specific LED
 //each color must be a value between 0-255
 //LEDS indexed starting at 1
@@ -52,7 +60,7 @@ boolean SetLEDColor(byte number, byte red, byte green, byte blue) {
   if (Wire.endTransmission() != 0)
   {
     //Sensor did not ACK
-    Serial.println("Error: Sensor did not ack (SetLEDColor)");
+    Serial.println("Error: Sensor did not ack");
     return (false);
   }
   return (true);
@@ -68,7 +76,7 @@ boolean SetLEDColor(byte red, byte green, byte blue) {
   if (Wire.endTransmission() != 0)
   {
     //Sensor did not ACK
-    Serial.println("Error: Sensor did not ack(SetLEDColor(all))");
+    Serial.println("Error: Sensor did not ack");
     return (false);
   }
   return (true);
@@ -85,7 +93,7 @@ boolean SetLEDBrightness(byte number, byte brightness) {
   if (Wire.endTransmission() != 0)
   {
     //Sensor did not ACK
-    Serial.println("Error: Sensor did not ack(SetLEDBrightness)");
+    Serial.println("Error: Sensor did not ack");
     return (false);
   }
   return (true);
@@ -100,7 +108,7 @@ boolean SetLEDBrightness(byte brightness) {
   if (Wire.endTransmission() != 0)
   {
     //Sensor did not ACK
-    Serial.println("Error: Sensor did not ack (SetLEDBrightness(all))");
+    Serial.println("Error: Sensor did not ack");
     return (false);
   }
   return (true);
@@ -112,7 +120,7 @@ boolean LEDOff(void) {
   if (Wire.endTransmission() != 0)
   {
     //Sensor did not ACK
-    Serial.println("Error: Sensor did not ack (LEDOff)");
+    Serial.println("Error: Sensor did not ack");
     return (false);
   }
   return (true);
@@ -127,7 +135,7 @@ boolean changeAddress(byte oldAddress, byte newAddress)
   if (Wire.endTransmission() != 0)
   {
     //Sensor did not ACK
-    Serial.println("Error: Sensor did not ack (ChangeAddress)");
+    Serial.println("Error: Sensor did not ack");
     return (false);
   }
   return (true);
@@ -141,8 +149,9 @@ boolean changeLength(byte newLength)
   if (Wire.endTransmission() != 0)
   {
     //Sensor did not ACK
-    Serial.println("Error: Sensor did not ack (ChangeAddress)");
+    Serial.println("Error: Sensor did not ack");
     return (false);
   }
   return (true);
 }
+
