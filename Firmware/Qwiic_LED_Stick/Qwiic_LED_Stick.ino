@@ -36,9 +36,10 @@
 #define COMMAND_CHANGE_LED_LENGTH (0x70)
 #define COMMAND_WRITE_SINGLE_LED_COLOR (0x71)
 #define COMMAND_WRITE_ALL_LED_COLOR (0x72)
-#define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x73)
-#define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x74)
-#define COMMAND_WRITE_ALL_LED_OFF (0x75)
+#define COMMAND_WRITE_ALL_LED_UNIQUE_COLOR (0x73)
+#define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x74)
+#define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x75)
+#define COMMAND_WRITE_ALL_LED_OFF (0x76)
 
 //Variables used in the I2C interrupt so we use volatile
 volatile byte setting_i2c_address = I2C_ADDRESS_DEFAULT; //The 7-bit I2C address of this LEDstick
@@ -63,11 +64,10 @@ const byte clkPin = 13; //pin to clock line of LEDs
 //  const byte clkPin = 4; //pin to clock line of LEDs
 
 void setup() {
-  pinMode(addr, INPUT);
+  pinMode(addr, INPUT_PULLUP);
   pinMode(dataPin, OUTPUT); //Data out to the LEDs
   pinMode(clkPin, OUTPUT); //clkPin for LED data shift
-
-  set_sleep_mode(SLEEP_MODE_IDLE);
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_enable();
   readSystemSettings(); //Load all system settings from EEPROM
   for (byte i = 0; i < LED_LENGTH_MAX; i++) {
@@ -143,6 +143,17 @@ void receiveEvent(int numberOfBytesReceived)
         }
       }
     }
+    else if (incoming == COMMAND_WRITE_ALL_LED_UNIQUE_COLOR) {
+      if (Wire.available())
+      {
+        byte Length = Wire.read();
+        for (byte i = 0; i < Length && i < setting_LED_length; i++) {
+          LEDStrip[i].red = Wire.read();
+          LEDStrip[i].green = Wire.read();
+          LEDStrip[i].blue = Wire.read();
+        }
+      }
+    }
     else if (incoming == COMMAND_WRITE_SINGLE_LED_BRIGHTNESS) {
       if (Wire.available())
       {
@@ -214,7 +225,6 @@ void initializeLEDArray(LEDSettings LED) {
   LED.green = 0;
   LED.blue = 0; //colors start at zero so the LED starts OFF
 }
-
 
 //Begin listening on I2C bus as I2C slave using the global variable setting_i2c_address
 void startI2C()

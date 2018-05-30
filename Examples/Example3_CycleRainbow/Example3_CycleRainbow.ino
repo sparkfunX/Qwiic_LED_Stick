@@ -14,7 +14,7 @@
 
 #include <Wire.h>
 
-byte LEDAddress = 0x22;
+byte LEDAddress = 0x23;
 
 void setup() {
   Wire.begin();
@@ -95,7 +95,7 @@ boolean SetLEDColor(byte number, byte red, byte green, byte blue) {
 //LEDS indexed starting at 1
 boolean SetLEDBrightness(byte number, byte brightness) {
   Wire.beginTransmission(LEDAddress);
-  Wire.write(0x73);
+  Wire.write(0x74);
   Wire.write(number);
   Wire.write(brightness);
   if (Wire.endTransmission() != 0)
@@ -111,7 +111,7 @@ boolean SetLEDBrightness(byte number, byte brightness) {
 //To turn all LEDs off but remember their previous color, set brightness to 0
 boolean SetLEDBrightness(byte brightness) {
   Wire.beginTransmission(LEDAddress);
-  Wire.write(0x74);
+  Wire.write(0x75);
   Wire.write(brightness);
   if (Wire.endTransmission() != 0)
   {
@@ -124,7 +124,7 @@ boolean SetLEDBrightness(byte brightness) {
 //Turn all LEDS off by setting color to 0
 boolean LEDOff(void) {
   Wire.beginTransmission(LEDAddress);
-  Wire.write(0x75);
+  Wire.write(0x76);
   if (Wire.endTransmission() != 0)
   {
     //Sensor did not ACK

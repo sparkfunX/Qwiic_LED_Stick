@@ -8,43 +8,24 @@
   Feel like supporting our work? Buy a board from SparkFun!
   https://www.sparkfun.com/products/14641
 
-  This example counts up 10 bits of binary and displays the number on the LED Stick.
+  This example changes the length of the attached LED strip and shows the results by writing the whole strip white.
 
 */
 
 #include <Wire.h>
 
-byte LEDAddress = 0x23;
+byte LEDAddress = 0x22;
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
+  changeLength(5); 
+  SetLEDColor(10, 10, 10);
 }
 
 void loop() {
-  for (int count = 0; count < 1024; count++) {
-    binaryLEDDisplay(count, 10);
-    binarySerialDisplay(count, 10);
-    delay(1000);
-  }
 
-}
 
-//Display binary on LEDS (LSB==LED1) of length LEDLength
-void binaryLEDDisplay(int count, byte LEDLength) {
-  for (byte i = 0; i < LEDLength; i++) {
-    SetLEDColor(i + 1, 255 * ((count & 1 << i) != 0), 0, 0); //ith LED will be red if the ith bit of the count is not zero
-  }
-}
-
-//Serial.print decimal and binary value of count, expecting n bits
-void binarySerialDisplay(int count, byte n) {
-  Serial.print(count);
-  Serial.print("\t|\t");
-  for (byte i = n; i > 0 ; i--) { //Start printing at MSB
-    Serial.print((count & 1 << (i - 1)) != 0);  //ith bit will be 1 if the ith bit of the count is not zero, and 0 if it is 0
-  }
-  Serial.print("\n"); //new line
 }
 
 //Change the color of a specific LED

@@ -14,7 +14,7 @@
 
 #include <Wire.h>
 
-byte LEDAddress = 0x22;
+byte LEDAddress = 0x23;
 
 void setup() {
   Wire.begin();
