@@ -70,9 +70,7 @@ void setup() {
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_enable();
   readSystemSettings(); //Load all system settings from EEPROM
-  for (byte i = 0; i < LED_LENGTH_MAX; i++) {
-    initializeLEDArray(LEDStrip[i]);  //Set all values
-  }
+  initializeLEDArray();
   startI2C(); //Determine the I2C address we should be using and begin listening on I2C bus
 }
 
@@ -219,11 +217,13 @@ void readSystemSettings(void)
 }
 
 //Sets all color values in LEDSettings array to 0 and brightness to maximum of 31
-void initializeLEDArray(LEDSettings LED) {
-  LED.brightness = 31; //brightness starts at maximum
-  LED.red = 0;
-  LED.green = 0;
-  LED.blue = 0; //colors start at zero so the LED starts OFF
+void initializeLEDArray(void) {
+  for (byte i = 0; i < LED_LENGTH_MAX; i++) {
+    LEDStrip[i].red = 0;
+    LEDStrip[i].green = 0;
+    LEDStrip[i].blue = 0; //colors start at zero so the LED starts OFF
+    LEDStrip[i].brightness = 31; //brightness starts at maximuminitializeLEDArray(LEDStrip[i]);  //Set all values
+  }
 }
 
 //Begin listening on I2C bus as I2C slave using the global variable setting_i2c_address

@@ -25,50 +25,50 @@ void setup() {
   Serial.begin(9600);
 }
 void loop() {
-  WalkingRainbow(20, 100);
+  WalkingRainbow(redArray, greenArray, blueArray, 20, 10, 100);
 }
 
-//Walks a rainbow across LED strip of length LEDlength with a delay of delayTime
-void WalkingRainbow(byte LEDlength, int delayTime) {
-  while (1) {
-    for (byte j = 0; j < LEDlength; j++) {
-      for (byte i = 1 ; i <= LEDlength ; i++) {
-        int n = i - j;
-        if (n <= 0) n += LEDlength;
-        if (n <= LEDlength / 6) {
-          redArray[i-1] = 255;
-          greenArray[i-1] = floor(6 * 255 / LEDlength * n);
-          blueArray[i-1] = 0;
-        }
-        else if (n > LEDlength / 6 && n <= LEDlength / 3) {
-          redArray[i-1] = floor(510 - 6 * 255 / LEDlength * n);
-          greenArray[i-1] = 255;
-          blueArray[i-1] = 0;
-        }
-        else if (n > LEDlength / 3 && n <= LEDlength / 2) {
-          redArray[i-1] = 0;
-          greenArray[i-1] = 255;
-          blueArray[i-1] = floor( 6 * 255 / LEDlength * n - 510);
-        }
-        else if (n > LEDlength / 2 && n <= 2 * LEDlength / 3) {
-          redArray[i-1] = 0;
-          greenArray[i-1] = floor(1020 - 6 * 255 / LEDlength * n);
-          blueArray[i-1] = 255;
-        }
-        else if (n > 2 * LEDlength / 3 && n <= 5 * LEDlength / 6) {
-          redArray[i-1] = floor(6 * 255 / LEDlength * n - 1020);
-          greenArray[i-1] = 0;
-          blueArray[i-1] = 255;
-        }
-        else {
-          redArray[i-1] = 255;
-          greenArray[i-1] = 0;
-          blueArray[i-1] = floor(1530 - 6 * 255 / LEDlength * n);
-        }
+//Walks a rainbow of length RainbowLength across LED strip of length LED Length with a delay of delayTime
+//Pass in 3 arrays of length RainbowLength, where RainbowLength<=255
+void WalkingRainbow(byte * redArray, byte * greenArray, byte * blueArray, byte RainbowLength, byte LEDLength, int delayTime) {
+  for (byte j = 0; j < RainbowLength; j++) {
+    for (byte i = 0 ; i < RainbowLength ; i++) {
+      float temp;
+      int n = i + 1 - j;
+      if (n <= 0) n += RainbowLength;
+      if (n <= floor(RainbowLength / 6)) {
+        redArray[i] = 255;
+        greenArray[i] = floor(6 * 255 / (float) RainbowLength * n);
+        blueArray[i] = 0;
       }
-      SetLEDColor(redArray, greenArray, blueArray, LEDlength);
-      delay(delayTime);
+      else if (n <= floor(RainbowLength / 3)) {
+        redArray[i] = floor(510 - 6 * 255 / (float) RainbowLength * n);
+        greenArray[i] = 255;
+        blueArray[i] = 0;
+      }
+      else if (n <= floor(RainbowLength / 2)) {
+        redArray[i] = 0;
+        greenArray[i] = 255;
+        blueArray[i] = floor( 6 * 255 / (float) RainbowLength * n - 510);
+      }
+      else if ( n <= floor(2 * RainbowLength / 3)) {
+        redArray[i] = 0;
+        greenArray[i] = floor(1020 - 6 * 255 / (float) RainbowLength * n);
+        blueArray[i] = 255;
+      }
+      else if (n <= floor(5 * RainbowLength / 6)) {
+        redArray[i] = floor(6 * 255 / (float) RainbowLength * n - 1020);
+        greenArray[i] = 0;
+        blueArray[i] = 255;
+      }
+      else {
+        redArray[i] = 255;
+        greenArray[i] = 0;
+        blueArray[i] = floor(1530 - (6 * 255 / (float)RainbowLength * n));;
+      }
     }
+    SetLEDColor(redArray, greenArray, blueArray, LEDLength);
+    delay(delayTime);
   }
 }
 
