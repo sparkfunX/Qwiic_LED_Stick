@@ -15,8 +15,7 @@
 #include <Wire.h>
 #include "Qwiic_LED_Stick.h"
 
-byte LEDAddress = 0x23;
-LEDStick LEDstick;
+LED LEDStick;
 //Create 3 arrays the same length as the LED stick
 //           Pixel#     1    2    3    4    5    6    7    8    9   10
 byte redArray[10]   = {214,  78, 183, 198,  59, 134,  15, 209, 219, 186}; //r
@@ -25,10 +24,10 @@ byte blueArray[10]  = {214, 147,  25, 124, 153, 163, 188,  33, 175, 221}; //b
 
 void setup() {
   Serial.begin(9600);
-  LEDstick.begin();
-  //Set all pixels at once to the color values corresponding to same the entry in the array
+  LEDStick.begin();
+  //set all pixels at once to the color values corresponding to same the entry in the array
   //e.g. the third LED will be the color of the third entries in the array
-  LEDstick.SetLEDColor(redArray, greenArray, blueArray, 10);
+  LEDStick.setLEDColor(redArray, greenArray, blueArray, 10);
 }
 
 

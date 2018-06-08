@@ -12,21 +12,19 @@
 
 */
 
-#include <Wire.h>
 #include "Qwiic_LED_Stick.h"
 
-byte LEDAddress = 0x23;
-LEDStick LEDstick;
-byte redArray[255];
-byte greenArray[255];
-byte blueArray[255];
+byte redArray[20];
+byte greenArray[20];
+byte blueArray[20];
+LED LEDStick;
 
 void setup() {
   Serial.begin(9600);
-  LEDstick.begin();
+  LEDStick.begin();
 }
 void loop() {
-  WalkingRainbow(redArray, greenArray, blueArray, 20, 10, 1000);
+  WalkingRainbow(redArray, greenArray, blueArray, 20, 10, 100);
 
 }
 
@@ -69,7 +67,7 @@ void WalkingRainbow(byte * redArray, byte * greenArray, byte * blueArray, byte R
         blueArray[i] = floor(1530 - (6 * 255 / (float)RainbowLength * n));;
       }
     }
-    LEDstick.SetLEDColor(redArray, greenArray, blueArray, LEDLength);
+    LEDStick.setLEDColor(redArray, greenArray, blueArray, LEDLength);
     delay(delayTime);
   }
 }

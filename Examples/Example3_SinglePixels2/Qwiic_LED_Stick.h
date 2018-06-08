@@ -30,32 +30,32 @@
 #define COMMAND_CHANGE_LED_LENGTH (0x70)
 #define COMMAND_WRITE_SINGLE_LED_COLOR (0x71)
 #define COMMAND_WRITE_ALL_LED_COLOR (0x72)
-#define COMMAND_WRITE_ALL_LED_UNIQUE_COLOR (0x73)
-#define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x74)
-#define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x75)
-#define COMMAND_WRITE_ALL_LED_UNIQUE_BRIGHTNESS (0x76)
-#define COMMAND_WRITE_ALL_LED_OFF (0x77)
+#define COMMAND_WRITE_RED_ARRAY (0x73)
+#define COMMAND_WRITE_GREEN_ARRAY (0x74)
+#define COMMAND_WRITE_BLUE_ARRAY (0x75)
+#define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x76)
+#define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x77)
+#define COMMAND_WRITE_ALL_LED_UNIQUE_BRIGHTNESS (0x78)
+#define COMMAND_WRITE_ALL_LED_OFF (0x79)
 
-
-class LEDStick
+class LED
 {
     // user-accessible "public" interface
   public:
-    LEDStick();
+    LED();
     boolean begin(byte address = 0x23);
-    boolean SetLEDColor(byte number, byte red, byte green, byte blue);
-    boolean SetLEDColor(byte red, byte green, byte blue);
-    boolean SetLEDColor(byte * red, byte * green, byte * blue, byte length);
-    boolean SetLEDBrightness(byte number, byte brightness);
-    boolean SetLEDBrightness(byte brightness);
-    boolean SetLEDBrightness(byte * brightness, byte length);
+    boolean setLEDColor(byte number, byte red, byte green, byte blue);
+    boolean setLEDColor(byte red, byte green, byte blue);
+    boolean setLEDColor(byte red[], byte green[], byte blue[], byte length);
+    boolean setLEDBrightness(byte number, byte brightness);
+    boolean setLEDBrightness(byte brightness);
+    boolean setLEDBrightness(byte * brightness, byte length);
     boolean LEDOff(void);
     boolean changeAddress(byte oldAddress, byte newAddress);
     boolean changeLength(byte newLength);
+
   private:
     byte _LEDAddress;
 };
-
-
 
 #endif

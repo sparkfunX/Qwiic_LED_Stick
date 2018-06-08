@@ -8,7 +8,7 @@
   Qwiic LED Stick is an I2C based LED Stick that stores an array of colors and brightness to write to an LED strip
 
   Feel like supporting our work? Buy a board from SparkFun!
-  https://www.sparkfun.com/products/14641
+  https://www.sparkfun.com/products/14782
 
   To install support for ATtiny85 in Arduino IDE: https://github.com/SpenceKonde/ATTinyCore/blob/master/Installation.md
   This core is installed from the Board Manager menu
@@ -23,22 +23,24 @@
 #include <EEPROM.h>
 #include <avr/sleep.h> //Needed for sleep_mode
 
-#define LOCATION_I2C_ADDRESS 0x01 //Location in EEPROM where the I2C address is stored
-#define LOCATION_LED_LENGTH 0x02 //Location in EEPROM where the LED_LENGTH is stored
+#define LOCATION_I2C_ADDRESS (0x01) //Location in EEPROM where the I2C address is stored
+#define LOCATION_LED_LENGTH (0x02) //Location in EEPROM where the LED_LENGTH is stored
 #define I2C_ADDRESS_DEFAULT (0x23) //Default I2C address
 #define I2C_ADDRESS_JUMPER (0x22) //Address with jumper closed 
 #define LED_LENGTH (10) //Code supports up to length 90, though board may not necessarily handle current required
-#define LED_LENGTH_MAX (30)
+#define LED_LENGTH_MAX (90) //Use an external power supply if LEDs behave unexpectedly
 
 #define COMMAND_CHANGE_ADDRESS (0xC7)
 #define COMMAND_CHANGE_LED_LENGTH (0x70)
 #define COMMAND_WRITE_SINGLE_LED_COLOR (0x71)
 #define COMMAND_WRITE_ALL_LED_COLOR (0x72)
-#define COMMAND_WRITE_ALL_LED_UNIQUE_COLOR (0x73)
-#define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x74)
-#define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x75)
-#define COMMAND_WRITE_ALL_LED_UNIQUE_BRIGHTNESS (0x76)
-#define COMMAND_WRITE_ALL_LED_OFF (0x77)
+#define COMMAND_WRITE_RED_ARRAY (0x73)
+#define COMMAND_WRITE_GREEN_ARRAY (0x74)
+#define COMMAND_WRITE_BLUE_ARRAY (0x75)
+#define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x76)
+#define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x77)
+#define COMMAND_WRITE_ALL_LED_UNIQUE_BRIGHTNESS (0x78)
+#define COMMAND_WRITE_ALL_LED_OFF (0x79)
 
 
 //Variables used in the I2C interrupt so we use volatile
@@ -53,10 +55,6 @@ typedef struct {
   volatile byte brightness;
 } LEDSettings;
 LEDSettings LEDStrip[LED_LENGTH_MAX]; //creates a global array of the states of all LEDs
-
-//const byte addr = 9; //Addr jumper
-//const byte dataPin = 11; //pin to data line of LEDs
-//const byte clkPin = 13; //pin to clock line of LEDs
 
 //  for ATtiny85
 const byte addr = 1; //Addr jumper
@@ -116,7 +114,7 @@ void receiveEvent(int numberOfBytesReceived)
         EEPROM.write(LOCATION_LED_LENGTH, setting_LED_length);
       }
     }
-    else if (incoming == COMMAND_WRITE_SINGLE_LED_COLOR) //Change color LEDS
+    else if (incoming == COMMAND_WRITE_SINGLE_LED_COLOR) //Change color one LED
     {
       if (Wire.available())
       {
@@ -128,7 +126,7 @@ void receiveEvent(int numberOfBytesReceived)
         LEDStrip[number - 1].blue = Wire.read();
       }
     }
-    else if (incoming == COMMAND_WRITE_ALL_LED_COLOR) {
+    else if (incoming == COMMAND_WRITE_ALL_LED_COLOR) { //Change color all LEDs same
       if (Wire.available())
       {
         LEDStrip[0].red = Wire.read();
@@ -141,18 +139,39 @@ void receiveEvent(int numberOfBytesReceived)
         }
       }
     }
-    else if (incoming == COMMAND_WRITE_ALL_LED_UNIQUE_COLOR) {
+    //The following three commands are to update the LED with different colors
+    //for each LED in a single function call from the library
+    else if (incoming == COMMAND_WRITE_RED_ARRAY) { // writes to the red array 
       if (Wire.available())
       {
         byte Length = Wire.read();
+        byte offset = Wire.read();
         for (byte i = 0; i < Length && i < setting_LED_length; i++) {
-          LEDStrip[i].red = Wire.read();
-          LEDStrip[i].green = Wire.read();
-          LEDStrip[i].blue = Wire.read();
+          LEDStrip[i + offset].red = Wire.read();
         }
       }
     }
-    else if (incoming == COMMAND_WRITE_SINGLE_LED_BRIGHTNESS) {
+    else if (incoming == COMMAND_WRITE_GREEN_ARRAY) { //writes to the green array
+      if (Wire.available())
+      {
+        byte Length = Wire.read();
+        byte offset = Wire.read();
+        for (byte i = 0; i < Length && i < setting_LED_length; i++) {
+          LEDStrip[i + offset].green = Wire.read();
+        }
+      }
+    }
+    else if (incoming == COMMAND_WRITE_BLUE_ARRAY) { //writes to the blue array
+      if (Wire.available())
+      {
+        byte Length = Wire.read();
+        byte offset = Wire.read();
+        for (byte i = 0; i < Length && i < setting_LED_length; i++) {
+          LEDStrip[i + offset].blue = Wire.read();
+        }
+      }
+    }
+    else if (incoming == COMMAND_WRITE_SINGLE_LED_BRIGHTNESS) { //change brightness of single LED
       if (Wire.available())
       {
         byte number = Wire.read();
@@ -161,7 +180,7 @@ void receiveEvent(int numberOfBytesReceived)
         LEDStrip[number - 1].brightness = Wire.read();
       }
     }
-    else if (incoming == COMMAND_WRITE_ALL_LED_BRIGHTNESS) {
+    else if (incoming == COMMAND_WRITE_ALL_LED_BRIGHTNESS) { //change brightness of all LEDs (same)
       if (Wire.available())
       {
         LEDStrip[0].brightness = Wire.read();
@@ -184,7 +203,8 @@ void WriteLED(void) {
   for (byte i = 0; i < 4; i++) { //start frame is 4 bytes of 0
     shiftOut(dataPin, clkPin, MSBFIRST, (byte)0);
   }
-  for (byte i = 0; i < setting_LED_length; i++) { //LED frame starts with 0b111, is followed by 5 bit brightness value, then bytes for blue, green, red
+  //LED frame starts with 0b111, is followed by 5 bit brightness value, then bytes for blue, green, red
+  for (byte i = 0; i < setting_LED_length; i++) { 
     shiftOut(dataPin, clkPin, MSBFIRST, (0b11100000) | LEDStrip[i].brightness);
     shiftOut(dataPin, clkPin, MSBFIRST, LEDStrip[i].blue);
     shiftOut(dataPin, clkPin, MSBFIRST, LEDStrip[i].green);

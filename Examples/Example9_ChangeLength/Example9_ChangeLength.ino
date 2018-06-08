@@ -12,18 +12,16 @@
 
 */
 
-#include <Wire.h>
 #include "Qwiic_LED_Stick.h"
 
-byte LEDAddress = 0x23;
-LEDStick LEDstick;
+LED LEDStick;
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
-  LEDstick.begin();
-  LEDstick.changeLength(5);
-  LEDstick.SetLEDColor(10, 10, 10);
+  LEDStick.begin();
+  LEDStick.changeLength(5);
+  LEDStick.setLEDColor(10, 10, 10);
 
 }
 

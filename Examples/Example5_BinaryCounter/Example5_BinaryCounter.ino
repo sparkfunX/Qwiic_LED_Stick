@@ -13,16 +13,14 @@
 
 */
 
-#include <Wire.h>
 #include "Qwiic_LED_Stick.h"
 
-byte LEDAddress = 0x23;
-LEDStick LEDstick;
+LED LEDStick;
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
-  LEDstick.begin();
+  LEDStick.begin();
 }
 
 void loop() {
@@ -37,7 +35,7 @@ void loop() {
 //Display binary on LEDS (LSB==LED10) of length LEDLength
 void binaryLEDDisplay(int count, byte LEDLength) {
   for (byte i = 0; i < LEDLength; i++) {
-    LEDstick.SetLEDColor(10-i, 255 * ((count & 1 << i) != 0), 0, 0); //ith LED will be red if the ith bit of the count is not zero
+    LEDStick.setLEDColor(10-i, 255 * ((count & 1 << i) != 0), 0, 0); //ith LED will be red if the ith bit of the count is not zero
   }
 }
 

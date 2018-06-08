@@ -12,16 +12,14 @@
 
 */
 
-#include <Wire.h>
 #include "Qwiic_LED_Stick.h"
 
-byte LEDAddress = 0x23;
-LEDStick LEDstick;
+LED LEDStick;
 
 void setup() {
   Wire.begin();
   Serial.begin(9600);
-  LEDstick.begin();
+  LEDStick.begin();
   byte r1 = 238, g1 = 49, b1 = 36, r2 = 66, g2 = 235, b2 = 244;
   colorGradient(r1, g1, b1, r2, g2, b2, 10);
 }
@@ -54,42 +52,42 @@ void colorGradient(byte r1, byte g1, byte b1, byte r2, byte g2, byte b2, byte LE
   }
   if (!r && !g && !b) {
     for (byte i = 1; i <= LEDLength; i++) {
-      LEDstick.SetLEDColor(i, r1 - rStep * i, g1 - gStep * i, b1 - bStep * i);
+      LEDStick.setLEDColor(i, r1 - rStep * i, g1 - gStep * i, b1 - bStep * i);
     }
   }
   else if (!r && !g && b) {
     for (byte i = 1; i <= LEDLength; i++) {
-      LEDstick.SetLEDColor(i, r1 - rStep * i, g1 - gStep * i, b1 + bStep * i);
+      LEDStick.setLEDColor(i, r1 - rStep * i, g1 - gStep * i, b1 + bStep * i);
     }
   }
   else if (!r && g && !b) {
     for (byte i = 1; i <= LEDLength; i++) {
-      LEDstick.SetLEDColor(i, r1 - (rStep * i), g1 + (gStep * i), b1 - (bStep * i));
+      LEDStick.setLEDColor(i, r1 - (rStep * i), g1 + (gStep * i), b1 - (bStep * i));
     }
   }
   else if (r && !g && !b) {
     for (byte i = 1; i <= LEDLength; i++) {
-      LEDstick.SetLEDColor(i, r1 + rStep * i, g1 - gStep * i, b1 - bStep * i);
+      LEDStick.setLEDColor(i, r1 + rStep * i, g1 - gStep * i, b1 - bStep * i);
     }
   }
   else if (r && g && !b) {
     for (byte i = 1; i <= LEDLength; i++) {
-      LEDstick.SetLEDColor(i, r1 + rStep * i, g1 + gStep * i, b1 - bStep * i);
+      LEDStick.setLEDColor(i, r1 + rStep * i, g1 + gStep * i, b1 - bStep * i);
     }
   }
   else if (r && !g && b) {
     for (byte i = 1; i <= LEDLength; i++) {
-      LEDstick.SetLEDColor(i, r1 + rStep * i, g1 - gStep * i, b1 + bStep * i);
+      LEDStick.setLEDColor(i, r1 + rStep * i, g1 - gStep * i, b1 + bStep * i);
     }
   }
   else if (!r && g && b) {
     for (byte i = 1; i <= LEDLength; i++) {
-      LEDstick.SetLEDColor(i, r1 - rStep * i, g1 + gStep * i, b1 + bStep * i);
+      LEDStick.setLEDColor(i, r1 - rStep * i, g1 + gStep * i, b1 + bStep * i);
     }
   }
   else if (r && g && b) {
     for (byte i = 1; i <= LEDLength; i++) {
-      LEDstick.SetLEDColor(i, r1 + rStep * i, g1 + gStep * i, b1 + bStep * i);
+      LEDStick.setLEDColor(i, r1 + rStep * i, g1 + gStep * i, b1 + bStep * i);
     }
   }
 }

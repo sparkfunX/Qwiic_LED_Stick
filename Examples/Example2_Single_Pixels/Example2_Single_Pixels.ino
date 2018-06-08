@@ -15,21 +15,19 @@
 #include <Wire.h>
 #include "Qwiic_LED_Stick.h"
 
-byte LEDAddress = 0x23;
-LEDStick LEDstick;
+LED LEDStick;
 
 void setup() {
-  Wire.begin();
   Serial.begin(9600);
-  LEDstick.begin();
+  LEDStick.begin();
 }
 
 void loop() {
-  LEDstick.LEDOff(); //turn off all LEDs
-  LEDstick.SetLEDColor(4,255, 0, 0); //turn on LED#4, red
+  LEDStick.LEDOff(); //turn off all LEDs
+  LEDStick.setLEDColor(4,255, 0, 0); //turn on LED#4, red
   delay(1000);
-  LEDstick.LEDOff(); //turn off all LEDs
-  LEDstick.SetLEDColor(6,255, 0, 0); //turn on LED#6, red
+  LEDStick.LEDOff(); //turn off all LEDs
+  LEDStick.setLEDColor(6,255, 0, 0); //turn on LED#6, red
   delay(1000);
 
 }

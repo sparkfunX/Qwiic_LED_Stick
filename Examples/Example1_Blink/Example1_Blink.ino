@@ -16,19 +16,19 @@
 #include "Qwiic_LED_Stick.h"
 
 byte LEDAddress = 0x23;
-LEDStick LEDstick;
+LED LEDStick;
 
 void setup() {
   Serial.begin(9600);
-  LEDstick.begin();
+  LEDStick.begin();
 }
 
 void loop() {
   Serial.println("On");
-  LEDstick.SetLEDColor(255, 255, 255); //Set all LEDs the same color (white)
+  LEDStick.setLEDColor(255, 255, 255); //Set all LEDs the same color (white)
   delay(1000);
   Serial.println("Off");
-  LEDstick.LEDOff(); //Turn off all LEDs
+  LEDStick.LEDOff(); //Turn off all LEDs
   delay(1000);
 
 }
