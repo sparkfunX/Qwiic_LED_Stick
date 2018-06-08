@@ -17,8 +17,6 @@
 
   To support 400kHz I2C communication reliably ATtiny85 needs to run at 8MHz. This requires user to
   click on 'Burn Bootloader' before code is loaded.
-
-
 */
 
 #include <Wire.h>
@@ -30,7 +28,7 @@
 #define I2C_ADDRESS_DEFAULT (0x23) //Default I2C address
 #define I2C_ADDRESS_JUMPER (0x22) //Address with jumper closed 
 #define LED_LENGTH (10) //Code supports up to length 90, though board may not necessarily handle current required
-#define LED_LENGTH_MAX (90)
+#define LED_LENGTH_MAX (30)
 
 #define COMMAND_CHANGE_ADDRESS (0xC7)
 #define COMMAND_CHANGE_LED_LENGTH (0x70)
@@ -39,7 +37,9 @@
 #define COMMAND_WRITE_ALL_LED_UNIQUE_COLOR (0x73)
 #define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x74)
 #define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x75)
-#define COMMAND_WRITE_ALL_LED_OFF (0x76)
+#define COMMAND_WRITE_ALL_LED_UNIQUE_BRIGHTNESS (0x76)
+#define COMMAND_WRITE_ALL_LED_OFF (0x77)
+
 
 //Variables used in the I2C interrupt so we use volatile
 volatile byte setting_i2c_address = I2C_ADDRESS_DEFAULT; //The 7-bit I2C address of this LEDstick
@@ -54,14 +54,14 @@ typedef struct {
 } LEDSettings;
 LEDSettings LEDStrip[LED_LENGTH_MAX]; //creates a global array of the states of all LEDs
 
-const byte addr = 9; //Addr jumper
-const byte dataPin = 11; //pin to data line of LEDs
-const byte clkPin = 13; //pin to clock line of LEDs
+//const byte addr = 9; //Addr jumper
+//const byte dataPin = 11; //pin to data line of LEDs
+//const byte clkPin = 13; //pin to clock line of LEDs
 
 //  for ATtiny85
-//  const byte addr = 1; //Addr jumper
-//  const byte dataPin = 3; //pin to data line of LEDs
-//  const byte clkPin = 4; //pin to clock line of LEDs
+const byte addr = 1; //Addr jumper
+const byte dataPin = 3; //pin to data line of LEDs
+const byte clkPin = 4; //pin to clock line of LEDs
 
 void setup() {
   pinMode(addr, INPUT_PULLUP);

@@ -1,0 +1,76 @@
+/*
+  An I2C based LED Stick
+  By: Ciara Jekel
+  SparkFun Electronics
+  Date: May 29th, 2018
+  License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
+
+  Feel like supporting our work? Buy a board from SparkFun!
+  https://www.sparkfun.com/products/14641
+
+  This example makes a moving rainbow on the LED Stick.
+
+*/
+
+#include <Wire.h>
+#include "Qwiic_LED_Stick.h"
+
+byte LEDAddress = 0x23;
+LEDStick LEDstick;
+byte redArray[255];
+byte greenArray[255];
+byte blueArray[255];
+
+void setup() {
+  Serial.begin(9600);
+  LEDstick.begin();
+}
+void loop() {
+  WalkingRainbow(redArray, greenArray, blueArray, 20, 10, 1000);
+
+}
+
+//Walks a rainbow of length RainbowLength across LED strip of length LED Length with a delay of delayTime
+//Pass in 3 arrays of length RainbowLength, where RainbowLength<=255
+void WalkingRainbow(byte * redArray, byte * greenArray, byte * blueArray, byte RainbowLength, byte LEDLength, int delayTime) {
+  for (byte j = 0; j < RainbowLength; j++) {
+    for (byte i = 0 ; i < RainbowLength ; i++) {
+      float temp;
+      int n = i + 1 - j;
+      if (n <= 0) n += RainbowLength;
+      if (n <= floor(RainbowLength / 6)) {
+        redArray[i] = 255;
+        greenArray[i] = floor(6 * 255 / (float) RainbowLength * n);
+        blueArray[i] = 0;
+      }
+      else if (n <= floor(RainbowLength / 3)) {
+        redArray[i] = floor(510 - 6 * 255 / (float) RainbowLength * n);
+        greenArray[i] = 255;
+        blueArray[i] = 0;
+      }
+      else if (n <= floor(RainbowLength / 2)) {
+        redArray[i] = 0;
+        greenArray[i] = 255;
+        blueArray[i] = floor( 6 * 255 / (float) RainbowLength * n - 510);
+      }
+      else if ( n <= floor(2 * RainbowLength / 3)) {
+        redArray[i] = 0;
+        greenArray[i] = floor(1020 - 6 * 255 / (float) RainbowLength * n);
+        blueArray[i] = 255;
+      }
+      else if (n <= floor(5 * RainbowLength / 6)) {
+        redArray[i] = floor(6 * 255 / (float) RainbowLength * n - 1020);
+        greenArray[i] = 0;
+        blueArray[i] = 255;
+      }
+      else {
+        redArray[i] = 255;
+        greenArray[i] = 0;
+        blueArray[i] = floor(1530 - (6 * 255 / (float)RainbowLength * n));;
+      }
+    }
+    LEDstick.SetLEDColor(redArray, greenArray, blueArray, LEDLength);
+    delay(delayTime);
+  }
+}
+
