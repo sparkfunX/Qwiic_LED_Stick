@@ -6,9 +6,11 @@
   License: This code is public domain but you buy me a beer if you use this and we meet someday (Beerware license).
 
   Qwiic LED Stick is an I2C based LED Stick that stores an array of colors and brightness to write to an LED strip
+  The Qwiic LED Stick features ten addressable APA102 LEDs, making it easy to add full color LED control using I2C.
+  Write to individual LEDs to display a count in binary, or write to the whole strip for cool lighting effects. 
 
   Feel like supporting our work? Buy a board from SparkFun!
-  https://www.sparkfun.com/products/14782
+  https://www.sparkfun.com/products/14783
 
   To install support for ATtiny85 in Arduino IDE: https://github.com/SpenceKonde/ATTinyCore/blob/master/Installation.md
   This core is installed from the Board Manager menu
@@ -39,8 +41,7 @@
 #define COMMAND_WRITE_BLUE_ARRAY (0x75)
 #define COMMAND_WRITE_SINGLE_LED_BRIGHTNESS (0x76)
 #define COMMAND_WRITE_ALL_LED_BRIGHTNESS (0x77)
-#define COMMAND_WRITE_ALL_LED_UNIQUE_BRIGHTNESS (0x78)
-#define COMMAND_WRITE_ALL_LED_OFF (0x79)
+#define COMMAND_WRITE_ALL_LED_OFF (0x78)
 
 
 //Variables used in the I2C interrupt so we use volatile
