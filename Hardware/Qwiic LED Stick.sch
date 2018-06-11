@@ -9677,7 +9677,7 @@ Silk outline shows header location.
 <sheets>
 <sheet>
 <plain>
-<text x="237.744" y="7.366" size="2.54" layer="94">X10</text>
+<text x="237.744" y="7.366" size="2.54" layer="94">1</text>
 <text x="167.64" y="101.6" size="1.778" layer="97">Clear Jumper to remove 
 I2C Pull-ups from bus</text>
 <text x="71.628" y="70.866" size="1.778" layer="97">Power</text>
@@ -9689,6 +9689,7 @@ Closed Jumper: 0x22</text>
 <wire x1="0" y1="58.42" x2="248.92" y2="58.42" width="0.2032" layer="97" style="longdash"/>
 <wire x1="2.54" y1="114.3" x2="251.46" y2="114.3" width="0.2032" layer="97" style="longdash"/>
 <text x="30.48" y="170.18" size="1.27" layer="97">-0.3 &lt; VCC &lt; 5.5V</text>
+<text x="30.48" y="167.64" size="1.27" layer="97">-0.3 &lt; VLED &lt; 5.5V</text>
 </plain>
 <instances>
 <instance part="JP3" gate="G$1" x="246.38" y="30.48"/>
