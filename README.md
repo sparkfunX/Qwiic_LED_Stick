@@ -1,4 +1,4 @@
-SparkFun Qwiic Pressure with LPS25HB
+﻿SparkFun Qwiic LED Stick
 ========================================
 
 ![Qwiic LED Stick](https://cdn.sparkfun.com/assets/parts/1/3/0/3/7/Qwiic_LED_Stick_Rainbow.gif)
