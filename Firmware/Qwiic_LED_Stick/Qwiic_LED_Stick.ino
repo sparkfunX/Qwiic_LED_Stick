@@ -30,7 +30,7 @@
 #define I2C_ADDRESS_DEFAULT (0x23) //Default I2C address
 #define I2C_ADDRESS_JUMPER (0x22) //Address with jumper closed 
 #define LED_LENGTH (10) //Code supports LED strip up to length 100
-#define LED_LENGTH_MAX (100) //Use an external power supply if adding LEDs 
+#define LED_LENGTH_MAX (90) //Use an external power supply if adding LEDs 
 
 #define COMMAND_CHANGE_ADDRESS (0xC7)
 #define COMMAND_CHANGE_LED_LENGTH (0x70)
